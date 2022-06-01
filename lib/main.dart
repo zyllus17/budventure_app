@@ -1,3 +1,4 @@
+import 'package:budventure_app/constants/theme.dart';
 import 'package:budventure_app/screen/screen.dart';
 import 'package:flutter/material.dart';
 
@@ -12,9 +13,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Budventure App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      theme: AppTheme.appTheme,
       home: HomeScreen(),
     );
   }
