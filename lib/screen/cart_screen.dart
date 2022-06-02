@@ -1,6 +1,9 @@
+import 'package:budventure_app/constants/text.dart';
 import 'package:flutter/material.dart';
 
 import 'package:budventure_app/screen/home_screen.dart';
+
+import '../constants/color.dart';
 
 class CartScreen extends StatelessWidget {
   final String itemName;
@@ -15,17 +18,20 @@ class CartScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          automaticallyImplyLeading: true,
-          leading: const Icon(
-            Icons.arrow_back_ios_new,
-            color: Colors.black,
+          // automaticallyImplyLeading: true,
+          leading: IconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: const Icon(
+              Icons.arrow_back_ios_new,
+              color: Colors.black,
+            ),
           ),
           elevation: 0,
           backgroundColor: Colors.transparent,
           centerTitle: true,
           title: const Text(
             'Cart',
-            style: const TextStyle(color: Colors.black),
+            style: TextStyle(color: Colors.black),
           ),
         ),
         body: Column(
@@ -61,44 +67,36 @@ class CartScreen extends StatelessWidget {
                 ),
               ],
             ),
-            const Padding(
+            Padding(
               padding: EdgeInsets.all(20.0),
-              child: CartButton(),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '\$200',
+                    style: Theme.of(context).textTheme.headline2,
+                  ),
+                  Container(
+                    width: 100,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      color: AppColors.green,
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                    child: Center(
+                      child: Text(
+                        AppText.buy,
+                        style: Theme.of(context)
+                            .textTheme
+                            .headline3!
+                            .copyWith(color: AppColors.white),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ));
-  }
-}
-
-class ItemInCart extends StatelessWidget {
-  const ItemInCart({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Icon(
-                Icons.done,
-                color: Colors.grey,
-              ),
-              const Text('Item Name'),
-              const Icon(
-                Icons.do_not_disturb_on_outlined,
-                color: Colors.grey,
-              ),
-            ],
-          ),
-          //TODO: No Divider before last item
-          const Divider(
-            thickness: 2,
-          )
-        ],
-      ),
-    );
   }
 }
