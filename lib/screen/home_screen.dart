@@ -1,54 +1,85 @@
+import 'package:budventure_app/services/item_services.dart';
+import 'package:budventure_app/widgets/search_box.dart';
+import 'package:flutter/material.dart';
 import 'package:budventure_app/constants/color.dart';
 import 'package:budventure_app/constants/text.dart';
 import 'package:budventure_app/model/item_model.dart';
 import 'package:budventure_app/screen/screen.dart';
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  TextEditingController searchController = TextEditingController();
+
+  ItemServices itemServices = ItemServices();
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  AppText.title,
-                  style: Theme.of(context).textTheme.headline1,
+        body: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                AppText.title,
+                style: Theme.of(context).textTheme.headline1,
+              ),
+              const SizedBox(height: 10),
+              Text(
+                AppText.trending,
+                style: Theme.of(context).textTheme.headline3,
+              ),
+              const SizedBox(height: 10),
+              SearchBox(searchController: searchController),
+              const SizedBox(height: 40),
+              Expanded(
+                child: FutureBuilder<ItemModel>(
+                  future: itemServices.fetchItem(),
+                  builder: (context, AsyncSnapshot<ItemModel> snapshot) {
+                    if (snapshot.hasData) {
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: snapshot.data!.data!.length,
+                        itemBuilder: (context, index) {
+                          String item =
+                              snapshot.data!.data![index].name.toString();
+                          if (searchController.text.isEmpty) {
+                            return productItem(snapshot, index, context);
+                          } else if (item
+                              .toLowerCase()
+                              .contains(searchController.text.toLowerCase())) {
+                            return productItem(snapshot, index, context);
+                          } else {
+                            return const SizedBox();
+                          }
+                        },
+                      );
+                    } else {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                  },
                 ),
-                const SizedBox(height: 10),
-                Text(
-                  AppText.trending,
-                  style: Theme.of(context).textTheme.headline3,
-                ),
-                const SizedBox(height: 10),
-                const SearchBox(),
-                const SizedBox(height: 40),
-                const Items(),
-                const Items(),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
-}
 
-class Items extends StatelessWidget {
-  const Items({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
+  Padding productItem(
+      AsyncSnapshot<ItemModel> snapshot, int index, BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: Container(
-        // height: 200,
         width: double.infinity,
         color: AppColors.boxgrey,
         child: Padding(
@@ -56,7 +87,15 @@ class Items extends StatelessWidget {
           child: Row(
             children: [
               Container(
-                child: const FlutterLogo(size: 150),
+                height: 150,
+                width: 150,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: NetworkImage(
+                      snapshot.data!.data![index].image!.toString(),
+                    ),
+                  ),
+                ),
               ),
               Expanded(
                 child: Column(
@@ -66,11 +105,11 @@ class Items extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Product Name',
+                          snapshot.data!.data![index].name!.toString(),
                           style: Theme.of(context).textTheme.headline3,
                         ),
                         Text(
-                          'Product Description Heelo app has the most comprehensive listing of local restaurant coupons and promotions. Just pick your favorite deals and locate the',
+                          snapshot.data!.data![index].description!.toString(),
                           style: Theme.of(context).textTheme.headline4,
                           overflow: TextOverflow.ellipsis,
                           maxLines: 2,
@@ -78,77 +117,46 @@ class Items extends StatelessWidget {
                         const SizedBox(height: 10),
                       ],
                     ),
-                    const CartButton()
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          snapshot.data!.data![index].price!.toString(),
+                          style: Theme.of(context).textTheme.headline2,
+                        ),
+                        Container(
+                          width: 70,
+                          decoration: BoxDecoration(
+                            color: AppColors.green,
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                          child: IconButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => CartScreen(
+                                    itemName: snapshot.data!.data![index].name!
+                                        .toString(),
+                                    price: snapshot.data!.data![index].price!
+                                        .toString(),
+                                  ),
+                                ),
+                              );
+                            },
+                            icon: const Icon(
+                              Icons.shopping_cart,
+                              color: AppColors.white,
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
                   ],
                 ),
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class CartButton extends StatelessWidget {
-  const CartButton({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          '\$200',
-          style: Theme.of(context).textTheme.headline2,
-        ),
-        Container(
-          width: 70,
-          decoration: BoxDecoration(
-            color: AppColors.green,
-            borderRadius: BorderRadius.circular(25),
-          ),
-          child: IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => CartScreen()),
-              );
-            },
-            icon: const Icon(
-              Icons.shopping_cart,
-              color: AppColors.white,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class SearchBox extends StatelessWidget {
-  const SearchBox({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 56,
-      width: double.infinity,
-      decoration: BoxDecoration(
-          color: AppColors.searchgrey, borderRadius: BorderRadius.circular(20)),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Row(
-          children: [
-            const Icon(Icons.search, color: AppColors.grey),
-            const SizedBox(width: 10),
-            Text(
-              AppText.search,
-              style: Theme.of(context).textTheme.headline5,
-            ),
-          ],
         ),
       ),
     );
