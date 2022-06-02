@@ -1,37 +1,68 @@
-import 'package:budventure_app/screen/home_screen.dart';
 import 'package:flutter/material.dart';
 
+import 'package:budventure_app/screen/home_screen.dart';
+
 class CartScreen extends StatelessWidget {
-  const CartScreen({Key? key}) : super(key: key);
+  final String itemName;
+  final String price;
+
+  const CartScreen({
+    Key? key,
+    required this.itemName,
+    required this.price,
+  }) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: true,
-          leading: Icon(
+          leading: const Icon(
             Icons.arrow_back_ios_new,
             color: Colors.black,
           ),
           elevation: 0,
           backgroundColor: Colors.transparent,
           centerTitle: true,
-          title: Text(
+          title: const Text(
             'Cart',
-            style: TextStyle(color: Colors.black),
+            style: const TextStyle(color: Colors.black),
           ),
         ),
         body: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            // ListView.builder(itemBuilder: itemBuilder),
             Column(
               children: [
-                ItemInCart(),
-                ItemInCart(),
-                ItemInCart(),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Icon(
+                            Icons.done,
+                            color: Colors.grey,
+                          ),
+                          Text(itemName),
+                          const Icon(
+                            Icons.do_not_disturb_on_outlined,
+                            color: Colors.grey,
+                          ),
+                        ],
+                      ),
+                      //TODO: No Divider before last item
+                      const Divider(
+                        thickness: 2,
+                      )
+                    ],
+                  ),
+                ),
               ],
             ),
-            Padding(
-              padding: const EdgeInsets.all(20.0),
+            const Padding(
+              padding: EdgeInsets.all(20.0),
               child: CartButton(),
             ),
           ],
@@ -51,19 +82,19 @@ class ItemInCart extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Icon(
+              const Icon(
                 Icons.done,
                 color: Colors.grey,
               ),
-              Text('Item Name'),
-              Icon(
+              const Text('Item Name'),
+              const Icon(
                 Icons.do_not_disturb_on_outlined,
                 color: Colors.grey,
               ),
             ],
           ),
           //TODO: No Divider before last item
-          Divider(
+          const Divider(
             thickness: 2,
           )
         ],
